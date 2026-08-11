@@ -980,3 +980,79 @@ function animate() {
 renderer.setAnimationLoop(
     animate
 );
+
+// ============================================================
+// WEBXR DIAGNOSTIC DISPLAY
+// ============================================================
+
+const xrDebug = document.createElement("div");
+
+xrDebug.style.position = "fixed";
+xrDebug.style.left = "20px";
+xrDebug.style.top = "20px";
+xrDebug.style.padding = "12px 16px";
+
+xrDebug.style.background =
+    "rgba(0, 0, 0, 0.65)";
+
+xrDebug.style.color = "white";
+
+xrDebug.style.fontFamily =
+    "Helvetica, Arial, sans-serif";
+
+xrDebug.style.fontSize = "12px";
+
+xrDebug.style.zIndex = "9999";
+
+xrDebug.style.borderRadius = "8px";
+
+document.body.appendChild(xrDebug);
+
+
+async function checkXR() {
+
+    let text = "";
+
+    text +=
+        "HTTPS: " +
+        window.isSecureContext +
+        "<br>";
+
+    text +=
+        "navigator.xr: " +
+        Boolean(navigator.xr) +
+        "<br>";
+
+
+    if (navigator.xr) {
+
+        try {
+
+            const supported =
+                await navigator.xr
+                    .isSessionSupported(
+                        "immersive-vr"
+                    );
+
+
+            text +=
+                "immersive-vr: " +
+                supported;
+
+        }
+
+        catch (error) {
+
+            text +=
+                "XR error: " +
+                error.name;
+
+        }
+
+    }
+
+    xrDebug.innerHTML = text;
+
+}
+
+checkXR();

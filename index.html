@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Three.js GLB Viewer</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #111;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+
+    <!-- Tell the browser where Three.js modules live -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+
+<body>
+
+<div id="mode-switch">
+    <button id="desktop-button" class="mode-button active">
+        DESKTOP
+    </button>
+
+    <button id="quest-button" class="mode-button">
+        META QUEST
+    </button>
+</div>
+
+<div id="vr-button-container"></div>
+
+    <script type="module" src="./js/app.js"></script>
+    <script src="styles.css"></script>
+
+</body>
+</html>

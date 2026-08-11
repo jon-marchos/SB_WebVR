@@ -2,16 +2,26 @@
 // THREE.JS WEBXR / META QUEST GLB VIEWER
 // ============================================================
 
+
 import * as THREE from "three";
 
-import { OrbitControls }
-    from "three/addons/controls/OrbitControls.js";
 
-import { GLTFLoader }
-    from "three/addons/loaders/GLTFLoader.js";
+import {
+    OrbitControls
+}
+from "three/addons/controls/OrbitControls.js";
 
-import { VRButton }
-    from "three/addons/webxr/VRButton.js";
+
+import {
+    GLTFLoader
+}
+from "three/addons/loaders/GLTFLoader.js";
+
+
+import {
+    VRButton
+}
+from "three/addons/webxr/VRButton.js";
 
 
 
@@ -19,9 +29,14 @@ import { VRButton }
 // SCENE
 // ============================================================
 
-const scene = new THREE.Scene();
+const scene =
+    new THREE.Scene();
 
-scene.background = new THREE.Color(0x111111);
+
+scene.background =
+    new THREE.Color(
+        0x111111
+    );
 
 
 
@@ -29,14 +44,26 @@ scene.background = new THREE.Color(0x111111);
 // CAMERA
 // ============================================================
 
-const camera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    10000
-);
+const camera =
+    new THREE.PerspectiveCamera(
 
-camera.position.set(5, 5, 5);
+        60,
+
+        window.innerWidth /
+        window.innerHeight,
+
+        0.1,
+
+        10000
+
+    );
+
+
+camera.position.set(
+    5,
+    5,
+    5
+);
 
 
 
@@ -44,28 +71,42 @@ camera.position.set(5, 5, 5);
 // RENDERER
 // ============================================================
 
-const renderer = new THREE.WebGLRenderer({
-    antialias: true
-});
+const renderer =
+    new THREE.WebGLRenderer({
+
+        antialias: true
+
+    });
+
 
 renderer.setSize(
     window.innerWidth,
     window.innerHeight
 );
 
+
 renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio, 2)
+
+    Math.min(
+        window.devicePixelRatio,
+        2
+    )
+
 );
 
 
-// ------------------------------------------------------------
+
+// ============================================================
 // ENABLE WEBXR
-// ------------------------------------------------------------
+// ============================================================
 
 renderer.xr.enabled = true;
 
 
-// Add canvas to page
+
+// ============================================================
+// ADD CANVAS TO PAGE
+// ============================================================
 
 document.body.appendChild(
     renderer.domElement
@@ -77,12 +118,17 @@ document.body.appendChild(
 // DESKTOP ORBIT CONTROLS
 // ============================================================
 
-const controls = new OrbitControls(
-    camera,
-    renderer.domElement
-);
+const controls =
+    new OrbitControls(
+
+        camera,
+        renderer.domElement
+
+    );
+
 
 controls.enableDamping = true;
+
 
 controls.dampingFactor = 0.05;
 
@@ -92,157 +138,208 @@ controls.dampingFactor = 0.05;
 // LIGHTING
 // ============================================================
 
-// General ambient lighting
 
-const ambientLight = new THREE.AmbientLight(
-    0xffffff,
-    1.5
+// ------------------------------------------------------------
+// AMBIENT LIGHT
+// ------------------------------------------------------------
+
+const ambientLight =
+    new THREE.AmbientLight(
+
+        0xffffff,
+
+        1.5
+
+    );
+
+
+scene.add(
+    ambientLight
 );
 
-scene.add(ambientLight);
 
 
-// Directional light
+// ------------------------------------------------------------
+// DIRECTIONAL LIGHT
+// ------------------------------------------------------------
 
-const directionalLight = new THREE.DirectionalLight(
-    0xffffff,
-    3
-);
+const directionalLight =
+    new THREE.DirectionalLight(
+
+        0xffffff,
+
+        3
+
+    );
+
 
 directionalLight.position.set(
+
     5,
+
     10,
+
     7
+
 );
 
-scene.add(directionalLight);
+
+scene.add(
+    directionalLight
+);
 
 
 
 // ============================================================
-// GLTF LOADER
+// GLTF / GLB LOADER
 // ============================================================
 
-const loader = new GLTFLoader();
+const loader =
+    new GLTFLoader();
 
 
 
 // ============================================================
-// MODEL URL
+// MODEL PATH
 // ============================================================
 //
 // IMPORTANT:
 //
-// app.js is located here:
+// Your website:
 //
-// SB_WEBVR/js/app.js
+// https://jon-marchos.github.io/SB_WebVR/
 //
-// model is located here:
+// Your model:
 //
-// SB_WEBVR/models/12_3_2024.glb
+// https://jon-marchos.github.io/
+// SB_WebVR/models/12_3_2024.glb
 //
-// Therefore we go:
 //
-// ../models/12_3_2024.glb
+// Because the page is already inside:
 //
-// Using import.meta.url means this works both locally AND
-// on a GitHub Pages project site.
+// /SB_WebVR/
 //
-// For example:
+// we use:
 //
-// https://jon-marchos.github.io/SB_WEBVR/js/app.js
+// ./models/12_3_2024.glb
 //
-// automatically resolves to:
+// NOT:
 //
-// https://jon-marchos.github.io/SB_WEBVR/models/12_3_2024.glb
+// /models/12_3_2024.glb
 //
+// The leading "/" would remove SB_WebVR.
 // ============================================================
 
-const modelURL = new URL(
-    "../models/12_3_2024.glb",
-    import.meta.url
-);
 
-
-
-// ============================================================
-// DEBUG URLS
-// ============================================================
-
-console.log(
-    "--------------------------------------"
-);
-
-console.log(
-    "APP.JS URL:"
-);
-
-console.log(
-    import.meta.url
-);
-
-
-console.log(
-    "GLB URL:"
-);
-
-console.log(
-    modelURL.href
-);
-
-console.log(
-    "--------------------------------------"
-);
+const modelPath =
+    "./models/12_3_2024.glb";
 
 
 
 // ============================================================
-// LOAD GLB MODEL
+// DEBUG MODEL PATH
+// ============================================================
+
+const resolvedModelURL =
+    new URL(
+
+        modelPath,
+
+        window.location.href
+
+    );
+
+
+console.log(
+    "======================================"
+);
+
+
+console.log(
+    "Current page URL:"
+);
+
+
+console.log(
+    window.location.href
+);
+
+
+console.log(
+    "Attempting to load GLB:"
+);
+
+
+console.log(
+    resolvedModelURL.href
+);
+
+
+console.log(
+    "======================================"
+);
+
+
+
+// ============================================================
+// LOAD MODEL
 // ============================================================
 
 loader.load(
 
-    modelURL.href,
+    modelPath,
+
 
 
     // --------------------------------------------------------
-    // MODEL SUCCESSFULLY LOADED
+    // SUCCESS
     // --------------------------------------------------------
 
     function (gltf) {
+
 
         console.log(
             "GLB loaded successfully!"
         );
 
 
-        const model = gltf.scene;
+        const model =
+            gltf.scene;
 
 
-        scene.add(model);
-
-
-
-        // ----------------------------------------------------
-        // CALCULATE MODEL BOUNDING BOX
-        // ----------------------------------------------------
-
-        const box = new THREE.Box3()
-            .setFromObject(model);
-
-
-        const size = box.getSize(
-            new THREE.Vector3()
-        );
-
-
-        const center = box.getCenter(
-            new THREE.Vector3()
+        scene.add(
+            model
         );
 
 
 
-        // Debug model dimensions
+        // ----------------------------------------------------
+        // GET MODEL BOUNDS
+        // ----------------------------------------------------
+
+        const box =
+            new THREE.Box3()
+                .setFromObject(
+                    model
+                );
+
+
+        const size =
+            box.getSize(
+
+                new THREE.Vector3()
+
+            );
+
+
+        const center =
+            box.getCenter(
+
+                new THREE.Vector3()
+
+            );
+
+
 
         console.log(
             "Model size:",
@@ -261,28 +358,38 @@ loader.load(
         // CENTER MODEL
         // ----------------------------------------------------
 
-        model.position.x -= center.x;
-
-        model.position.y -= center.y;
-
-        model.position.z -= center.z;
+        model.position.x -=
+            center.x;
 
 
+        model.position.y -=
+            center.y;
 
-        // ----------------------------------------------------
-        // DETERMINE LARGEST DIMENSION
-        // ----------------------------------------------------
 
-        const maxDimension = Math.max(
-            size.x,
-            size.y,
-            size.z
-        );
+        model.position.z -=
+            center.z;
 
 
 
         // ----------------------------------------------------
-        // AUTOMATIC DESKTOP CAMERA POSITION
+        // FIND LARGEST MODEL DIMENSION
+        // ----------------------------------------------------
+
+        const maxDimension =
+            Math.max(
+
+                size.x,
+
+                size.y,
+
+                size.z
+
+            );
+
+
+
+        // ----------------------------------------------------
+        // AUTO-FIT DESKTOP CAMERA
         // ----------------------------------------------------
 
         const cameraDistance =
@@ -290,30 +397,37 @@ loader.load(
 
 
         camera.position.set(
+
             cameraDistance,
+
             cameraDistance * 0.75,
+
             cameraDistance
+
         );
 
 
 
         // ----------------------------------------------------
-        // ORBIT AROUND CENTER OF MODEL
+        // CENTER ORBIT CONTROLS
         // ----------------------------------------------------
 
         controls.target.set(
+
             0,
+
             0,
+
             0
+
         );
 
 
         controls.update();
 
 
-
         console.log(
-            "Camera positioned at:",
+            "Camera position:",
             camera.position
         );
 
@@ -322,20 +436,31 @@ loader.load(
 
 
     // --------------------------------------------------------
-    // LOADING PROGRESS
+    // PROGRESS
     // --------------------------------------------------------
 
     function (xhr) {
 
-        if (xhr.total > 0) {
+
+        if (
+            xhr.total > 0
+        ) {
+
 
             const percent =
-                (xhr.loaded / xhr.total) * 100;
+                (
+                    xhr.loaded /
+                    xhr.total
+                ) * 100;
 
 
             console.log(
+
                 "Model loading:",
-                percent.toFixed(1) + "%"
+
+                percent.toFixed(1)
+                + "%"
+
             );
 
         }
@@ -345,34 +470,36 @@ loader.load(
 
 
     // --------------------------------------------------------
-    // LOADING ERROR
+    // ERROR
     // --------------------------------------------------------
 
     function (error) {
+
 
         console.error(
             "======================================"
         );
 
+
         console.error(
-            "GLB LOADING FAILED"
+            "GLB LOADING ERROR"
         );
+
 
         console.error(
             "Attempted URL:"
         );
 
-        console.error(
-            modelURL.href
-        );
 
         console.error(
-            "Loader error:"
+            resolvedModelURL.href
         );
+
 
         console.error(
             error
         );
+
 
         console.error(
             "======================================"
@@ -385,7 +512,7 @@ loader.load(
 
 
 // ============================================================
-// USER INTERFACE
+// UI ELEMENTS
 // ============================================================
 
 const desktopButton =
@@ -408,10 +535,11 @@ const vrButtonContainer =
 
 
 // ============================================================
-// CURRENT VIEW MODE
+// CURRENT MODE
 // ============================================================
 
-let currentMode = "desktop";
+let currentMode =
+    "desktop";
 
 
 
@@ -419,9 +547,10 @@ let currentMode = "desktop";
 // CREATE THREE.JS VR BUTTON
 // ============================================================
 
-const vrButton = VRButton.createButton(
-    renderer
-);
+const vrButton =
+    VRButton.createButton(
+        renderer
+    );
 
 
 vrButtonContainer.appendChild(
@@ -431,23 +560,27 @@ vrButtonContainer.appendChild(
 
 
 // ============================================================
-// STYLE THREE.JS VR BUTTON
-// ============================================================
-//
-// Three.js puts its own inline styles on VRButton,
-// so we're overriding them here.
+// STYLE VR BUTTON
 // ============================================================
 
-vrButton.style.position = "relative";
-
-vrButton.style.left = "auto";
-
-vrButton.style.right = "auto";
-
-vrButton.style.bottom = "auto";
+vrButton.style.position =
+    "relative";
 
 
-vrButton.style.width = "auto";
+vrButton.style.left =
+    "auto";
+
+
+vrButton.style.right =
+    "auto";
+
+
+vrButton.style.bottom =
+    "auto";
+
+
+vrButton.style.width =
+    "auto";
 
 
 vrButton.style.fontFamily =
@@ -501,43 +634,47 @@ desktopButton.addEventListener(
 
     function () {
 
+
+        currentMode =
+            "desktop";
+
+
         console.log(
-            "Switching to DESKTOP mode"
+            "Desktop mode selected."
         );
 
 
-        currentMode = "desktop";
 
-
-        // --------------------------------
-        // Update UI
-        // --------------------------------
+        // UI
 
         desktopButton
             .classList
-            .add("active");
+            .add(
+                "active"
+            );
 
 
         questButton
             .classList
-            .remove("active");
+            .remove(
+                "active"
+            );
 
 
 
-        // --------------------------------
-        // Hide ENTER VR button
-        // --------------------------------
+        // Hide WebXR button
 
-        vrButtonContainer.style.display =
+        vrButtonContainer
+            .style
+            .display =
             "none";
 
 
 
-        // --------------------------------
-        // Enable OrbitControls
-        // --------------------------------
+        // Enable mouse controls
 
-        controls.enabled = true;
+        controls.enabled =
+            true;
 
     }
 
@@ -555,43 +692,47 @@ questButton.addEventListener(
 
     function () {
 
+
+        currentMode =
+            "quest";
+
+
         console.log(
-            "Switching to META QUEST mode"
+            "Meta Quest mode selected."
         );
 
 
-        currentMode = "quest";
 
-
-        // --------------------------------
-        // Update UI
-        // --------------------------------
+        // UI
 
         questButton
             .classList
-            .add("active");
+            .add(
+                "active"
+            );
 
 
         desktopButton
             .classList
-            .remove("active");
+            .remove(
+                "active"
+            );
 
 
 
-        // --------------------------------
-        // Show ENTER VR button
-        // --------------------------------
+        // Show WebXR button
 
-        vrButtonContainer.style.display =
+        vrButtonContainer
+            .style
+            .display =
             "block";
 
 
 
-        // --------------------------------
-        // Disable desktop OrbitControls
-        // --------------------------------
+        // Disable mouse controls
 
-        controls.enabled = false;
+        controls.enabled =
+            false;
 
     }
 
@@ -607,57 +748,79 @@ console.log(
     "======================================"
 );
 
+
 console.log(
     "WEBXR DEBUG"
 );
 
 
 console.log(
+
     "Secure context:",
+
     window.isSecureContext
+
 );
 
 
 console.log(
+
     "navigator.xr:",
+
     navigator.xr
+
 );
 
 
 
 // ============================================================
-// CHECK FOR IMMERSIVE VR SUPPORT
+// CHECK IMMERSIVE VR SUPPORT
 // ============================================================
 
-if (navigator.xr) {
+if (
+    navigator.xr
+) {
+
 
     navigator.xr
         .isSessionSupported(
             "immersive-vr"
         )
 
+
         .then(
 
-            function (supported) {
+            function (
+                supported
+            ) {
+
 
                 console.log(
+
                     "Immersive VR supported:",
+
                     supported
+
                 );
 
 
-                if (supported) {
+                if (
+                    supported
+                ) {
+
 
                     console.log(
-                        "WebXR VR is ready!"
+                        "WebXR is ready for VR."
                     );
 
                 }
 
+
                 else {
 
+
                     console.warn(
-                        "Browser does not report immersive-vr support."
+                        "Immersive VR is not supported in this browser."
                     );
 
                 }
@@ -666,13 +829,20 @@ if (navigator.xr) {
 
         )
 
+
         .catch(
 
-            function (error) {
+            function (
+                error
+            ) {
+
 
                 console.error(
+
                     "WebXR support check failed:",
+
                     error
+
                 );
 
             }
@@ -681,23 +851,20 @@ if (navigator.xr) {
 
 }
 
+
 else {
 
+
     console.warn(
-        "navigator.xr does not exist."
+        "navigator.xr is unavailable."
     );
 
 
     console.warn(
-        "WebXR is unavailable in this browser/context."
+        "WebXR is not available in this browser/context."
     );
 
 }
-
-
-console.log(
-    "======================================"
-);
 
 
 
@@ -711,8 +878,9 @@ renderer.xr.addEventListener(
 
     function () {
 
+
         console.log(
-            "WebXR session started!"
+            "WebXR session started."
         );
 
     }
@@ -720,11 +888,13 @@ renderer.xr.addEventListener(
 );
 
 
+
 renderer.xr.addEventListener(
 
     "sessionend",
 
     function () {
+
 
         console.log(
             "WebXR session ended."
@@ -746,7 +916,9 @@ window.addEventListener(
 
     function () {
 
+
         camera.aspect =
+
             window.innerWidth /
             window.innerHeight;
 
@@ -755,8 +927,11 @@ window.addEventListener(
 
 
         renderer.setSize(
+
             window.innerWidth,
+
             window.innerHeight
+
         );
 
     }
@@ -766,18 +941,20 @@ window.addEventListener(
 
 
 // ============================================================
-// ANIMATION / RENDER LOOP
+// RENDER LOOP
 // ============================================================
 
 function animate() {
 
 
-    // Desktop controls should only update
-    // while we're in desktop mode.
+    // OrbitControls should only update
+    // in desktop mode.
 
     if (
-        currentMode === "desktop"
+        currentMode ===
+        "desktop"
     ) {
+
 
         controls.update();
 
@@ -785,8 +962,11 @@ function animate() {
 
 
     renderer.render(
+
         scene,
+
         camera
+
     );
 
 }
@@ -794,15 +974,7 @@ function animate() {
 
 
 // ============================================================
-// START RENDER LOOP
-// ============================================================
-//
-// setAnimationLoop() is required instead of the traditional:
-//
-// requestAnimationFrame()
-//
-// because WebXR needs to control the render loop when
-// the headset enters immersive VR.
+// START WEBXR-COMPATIBLE RENDER LOOP
 // ============================================================
 
 renderer.setAnimationLoop(

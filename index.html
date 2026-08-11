@@ -1,24 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Three.js GLB Viewer</title>
+    <title>Three.js WebVR Viewer</title>
 
     <style>
         body {
             margin: 0;
             overflow: hidden;
             background: #111;
+
+            font-family: Helvetica, Arial, sans-serif;
         }
 
         canvas {
             display: block;
         }
+
+
+        /* --------------------------------
+           MODE SWITCH
+        -------------------------------- */
+
+        #mode-switch {
+            position: fixed;
+
+            right: 24px;
+            bottom: 24px;
+
+            display: flex;
+
+            padding: 4px;
+
+            border-radius: 10px;
+
+            background: rgba(25, 25, 25, 0.55);
+
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            border: 1px solid rgba(255, 255, 255, 0.15);
+
+            z-index: 1000;
+        }
+
+
+        .mode-button {
+            font-family: Helvetica, Arial, sans-serif;
+
+            font-size: 11px;
+            font-weight: 500;
+
+            letter-spacing: 0.7px;
+
+            padding: 10px 14px;
+
+            border: none;
+            border-radius: 7px;
+
+            background: transparent;
+
+            color: rgba(255, 255, 255, 0.6);
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease;
+        }
+
+
+        .mode-button:hover {
+            color: white;
+        }
+
+
+        .mode-button.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+        }
+
+
+        /* --------------------------------
+           VR BUTTON CONTAINER
+        -------------------------------- */
+
+        #vr-button-container {
+            position: fixed;
+
+            right: 24px;
+            bottom: 80px;
+
+            z-index: 999;
+
+            display: none;
+        }
+
     </style>
 
-    <!-- Tell the browser where Three.js modules live -->
+
+    <!-- Three.js import map -->
+
     <script type="importmap">
     {
         "imports": {
@@ -27,24 +112,46 @@
         }
     }
     </script>
+
 </head>
+
 
 <body>
 
-<div id="mode-switch">
-    <button id="desktop-button" class="mode-button active">
-        DESKTOP
-    </button>
+    <!-- Desktop / Quest Toggle -->
 
-    <button id="quest-button" class="mode-button">
-        META QUEST
-    </button>
-</div>
+    <div id="mode-switch">
 
-<div id="vr-button-container"></div>
+        <button
+            id="desktop-button"
+            class="mode-button active"
+        >
+            DESKTOP
+        </button>
 
-    <script type="module" src="./js/app.js"></script>
-    <script src="styles.css"></script>
+
+        <button
+            id="quest-button"
+            class="mode-button"
+        >
+            META QUEST
+        </button>
+
+    </div>
+
+
+    <!-- Three.js VR Button will be inserted here -->
+
+    <div id="vr-button-container"></div>
+
+
+    <!-- Main JavaScript -->
+
+    <script
+        type="module"
+        src="./js/app.js"
+    ></script>
 
 </body>
+
 </html>

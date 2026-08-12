@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Three.js WebVR Viewer</title>
+    <title>SB WebVR Viewer</title>
 
 
     <style>
@@ -20,7 +21,9 @@
 
         html,
         body {
+
             margin: 0;
+
             width: 100%;
             height: 100%;
 
@@ -36,7 +39,123 @@
 
 
         canvas {
+
             display: block;
+
+        }
+
+
+
+        /* ====================================================
+           UPLOAD BUTTON
+        ==================================================== */
+
+        #upload-container {
+
+            position: fixed;
+
+            left: 24px;
+            bottom: 24px;
+
+            z-index: 1000;
+
+        }
+
+
+        #upload-button {
+
+            font-family:
+                Helvetica,
+                Arial,
+                sans-serif;
+
+            font-size: 11px;
+
+            font-weight: 500;
+
+            letter-spacing: 0.7px;
+
+            padding: 12px 18px;
+
+            border-radius: 10px;
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.15);
+
+            background:
+                rgba(25, 25, 25, 0.55);
+
+            color: white;
+
+            backdrop-filter:
+                blur(10px);
+
+            -webkit-backdrop-filter:
+                blur(10px);
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease;
+
+        }
+
+
+        #upload-button:hover {
+
+            background:
+                rgba(255, 255, 255, 0.18);
+
+        }
+
+
+
+        /* Hide actual browser file input */
+
+        #file-input {
+
+            display: none;
+
+        }
+
+
+
+        /* ====================================================
+           FILE NAME
+        ==================================================== */
+
+        #file-name {
+
+            position: fixed;
+
+            left: 24px;
+            bottom: 76px;
+
+            padding: 8px 12px;
+
+            border-radius: 8px;
+
+            background:
+                rgba(25, 25, 25, 0.55);
+
+            color:
+                rgba(255, 255, 255, 0.75);
+
+            font-size: 11px;
+
+            letter-spacing: 0.4px;
+
+            backdrop-filter:
+                blur(10px);
+
+            -webkit-backdrop-filter:
+                blur(10px);
+
+            display: none;
+
+            z-index: 1000;
+
         }
 
 
@@ -72,12 +191,13 @@
                 rgba(255, 255, 255, 0.15);
 
             z-index: 1000;
+
         }
 
 
 
         /* ====================================================
-           MODE BUTTONS
+           MODE BUTTON
         ==================================================== */
 
         .mode-button {
@@ -93,16 +213,13 @@
 
             letter-spacing: 0.7px;
 
-            padding:
-                10px
-                14px;
+            padding: 10px 14px;
 
             border: none;
 
             border-radius: 7px;
 
-            background:
-                transparent;
+            background: transparent;
 
             color:
                 rgba(255, 255, 255, 0.6);
@@ -112,15 +229,15 @@
             transition:
                 background 0.2s ease,
                 color 0.2s ease;
-        }
 
+        }
 
 
         .mode-button:hover {
 
             color: white;
-        }
 
+        }
 
 
         .mode-button.active {
@@ -128,14 +245,14 @@
             background:
                 rgba(255, 255, 255, 0.18);
 
-            color:
-                white;
+            color: white;
+
         }
 
 
 
         /* ====================================================
-           VR BUTTON CONTAINER
+           VR BUTTON
         ==================================================== */
 
         #vr-button-container {
@@ -149,6 +266,47 @@
             z-index: 999;
 
             display: none;
+
+        }
+
+
+
+        /* ====================================================
+           START MESSAGE
+        ==================================================== */
+
+        #start-message {
+
+            position: fixed;
+
+            left: 50%;
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            text-align: center;
+
+            color:
+                rgba(255, 255, 255, 0.65);
+
+            font-size: 13px;
+
+            letter-spacing: 0.5px;
+
+            pointer-events: none;
+
+            z-index: 100;
+
+        }
+
+
+        #start-message strong {
+
+            color: white;
+
+            font-weight: 500;
+
         }
 
     </style>
@@ -160,6 +318,7 @@
     ======================================================= -->
 
     <script type="importmap">
+
     {
         "imports": {
 
@@ -171,6 +330,7 @@
 
         }
     }
+
     </script>
 
 </head>
@@ -181,7 +341,54 @@
 
 
     <!-- ======================================================
-         DESKTOP / META QUEST SWITCH
+         START MESSAGE
+    ======================================================= -->
+
+    <div id="start-message">
+
+        <strong>NO MODEL LOADED</strong>
+
+        <br><br>
+
+        Select a GLB file to begin.
+
+    </div>
+
+
+
+    <!-- ======================================================
+         FILE NAME
+    ======================================================= -->
+
+    <div id="file-name"></div>
+
+
+
+    <!-- ======================================================
+         FILE UPLOAD
+    ======================================================= -->
+
+    <div id="upload-container">
+
+        <input
+            type="file"
+            id="file-input"
+            accept=".glb"
+        >
+
+
+        <button id="upload-button">
+
+            UPLOAD GLB
+
+        </button>
+
+    </div>
+
+
+
+    <!-- ======================================================
+         DESKTOP / QUEST SWITCH
     ======================================================= -->
 
     <div id="mode-switch">
@@ -191,7 +398,9 @@
             id="desktop-button"
             class="mode-button active"
         >
+
             DESKTOP
+
         </button>
 
 
@@ -199,7 +408,9 @@
             id="quest-button"
             class="mode-button"
         >
+
             META QUEST
+
         </button>
 
 
@@ -208,7 +419,7 @@
 
 
     <!-- ======================================================
-         VR BUTTON GETS INSERTED HERE
+         WEBXR BUTTON
     ======================================================= -->
 
     <div id="vr-button-container"></div>
@@ -217,10 +428,6 @@
 
     <!-- ======================================================
          APP
-         
-         IMPORTANT:
-         "./js/app.js"
-         keeps the SB_WebVR repository path.
     ======================================================= -->
 
     <script

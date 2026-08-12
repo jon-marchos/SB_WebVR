@@ -1,6 +1,6 @@
 // ============================================================
 // SB WEBVR
-// LOCAL GLB VIEWER + WEBXR
+// GLB VIEWER + META QUEST WEBXR CONTROLS
 // ============================================================
 
 
@@ -23,6 +23,12 @@ import {
     VRButton
 }
 from "three/addons/webxr/VRButton.js";
+
+
+import {
+    XRControllerModelFactory
+}
+from "three/addons/webxr/XRControllerModelFactory.js";
 
 
 
@@ -60,10 +66,39 @@ const camera =
     );
 
 
+
 camera.position.set(
     5,
     5,
     5
+);
+
+
+
+// ============================================================
+// VR PLAYER RIG
+// ============================================================
+//
+// We move this group in VR instead of moving the camera.
+//
+// scene
+//   └── player
+//         └── camera
+//
+// The headset still controls the camera's local pose.
+// ============================================================
+
+const player =
+    new THREE.Group();
+
+
+scene.add(
+    player
+);
+
+
+player.add(
+    camera
 );
 
 
@@ -96,7 +131,8 @@ renderer.setPixelRatio(
 );
 
 
-renderer.xr.enabled = true;
+renderer.xr.enabled =
+    true;
 
 
 document.body.appendChild(
@@ -106,7 +142,7 @@ document.body.appendChild(
 
 
 // ============================================================
-// ORBIT CONTROLS
+// DESKTOP CONTROLS
 // ============================================================
 
 const controls =
@@ -118,9 +154,12 @@ const controls =
     );
 
 
-controls.enableDamping = true;
+controls.enableDamping =
+    true;
 
-controls.dampingFactor = 0.05;
+
+controls.dampingFactor =
+    0.05;
 
 
 
@@ -172,6 +211,127 @@ scene.add(
 
 
 // ============================================================
+// XR CONTROLLERS
+// ============================================================
+
+const controller1 =
+    renderer.xr.getController(
+        0
+    );
+
+
+const controller2 =
+    renderer.xr.getController(
+        1
+    );
+
+
+player.add(
+    controller1
+);
+
+
+player.add(
+    controller2
+);
+
+
+
+// ============================================================
+// XR CONTROLLER MODELS
+// ============================================================
+
+const controllerModelFactory =
+    new XRControllerModelFactory();
+
+
+
+// ------------------------------------------------------------
+// LEFT / FIRST CONTROLLER GRIP
+// ------------------------------------------------------------
+
+const controllerGrip1 =
+    renderer.xr.getControllerGrip(
+        0
+    );
+
+
+controllerGrip1.add(
+
+    controllerModelFactory
+        .createControllerModel(
+            controllerGrip1
+        )
+
+);
+
+
+player.add(
+    controllerGrip1
+);
+
+
+
+// ------------------------------------------------------------
+// RIGHT / SECOND CONTROLLER GRIP
+// ------------------------------------------------------------
+
+const controllerGrip2 =
+    renderer.xr.getControllerGrip(
+        1
+    );
+
+
+controllerGrip2.add(
+
+    controllerModelFactory
+        .createControllerModel(
+            controllerGrip2
+        )
+
+);
+
+
+player.add(
+    controllerGrip2
+);
+
+
+
+// ============================================================
+// VR MOVEMENT SETTINGS
+// ============================================================
+
+const moveSpeed =
+    3.0;
+
+
+// vertical movement speed
+
+const verticalSpeed =
+    2.0;
+
+
+// joystick deadzone
+
+const deadzone =
+    0.15;
+
+
+
+// ============================================================
+// CLOCK
+// ============================================================
+//
+// Makes movement independent of headset refresh rate.
+// ============================================================
+
+const clock =
+    new THREE.Clock();
+
+
+
+// ============================================================
 // GLTF LOADER
 // ============================================================
 
@@ -181,17 +341,20 @@ const loader =
 
 
 // ============================================================
-// MODEL VARIABLES
+// MODEL STATE
 // ============================================================
 
-let currentModel = null;
+let currentModel =
+    null;
 
-let currentObjectURL = null;
+
+let currentObjectURL =
+    null;
 
 
 
 // ============================================================
-// UI ELEMENTS
+// UI
 // ============================================================
 
 const uploadButton =
@@ -238,7 +401,16 @@ const vrButtonContainer =
 
 
 // ============================================================
-// OPEN FILE BROWSER
+// CURRENT MODE
+// ============================================================
+
+let currentMode =
+    "desktop";
+
+
+
+// ============================================================
+// UPLOAD BUTTON
 // ============================================================
 
 uploadButton.addEventListener(
@@ -263,7 +435,9 @@ fileInput.addEventListener(
 
     "change",
 
-    function (event) {
+    function (
+        event
+    ) {
 
 
         const file =
@@ -279,18 +453,24 @@ fileInput.addEventListener(
 
 
         // ----------------------------------------------------
-        // MAKE SURE IT IS A GLB
+        // CHECK EXTENSION
         // ----------------------------------------------------
 
         if (
+
             !file.name
                 .toLowerCase()
-                .endsWith(".glb")
+                .endsWith(
+                    ".glb"
+                )
+
         ) {
+
 
             alert(
                 "Please select a .glb file."
             );
+
 
             return;
 
@@ -305,19 +485,25 @@ fileInput.addEventListener(
 
 
         console.log(
+
             "File size:",
+
             (
                 file.size /
                 1024 /
                 1024
-            ).toFixed(2),
+            ).toFixed(
+                2
+            ),
+
             "MB"
+
         );
 
 
 
         // ----------------------------------------------------
-        // SHOW FILE NAME
+        // UI
         // ----------------------------------------------------
 
         fileName.textContent =
@@ -328,18 +514,13 @@ fileInput.addEventListener(
             "block";
 
 
-
-        // ----------------------------------------------------
-        // REMOVE START MESSAGE
-        // ----------------------------------------------------
-
         startMessage.style.display =
             "none";
 
 
 
         // ----------------------------------------------------
-        // REMOVE OLD MODEL
+        // REMOVE PREVIOUS MODEL
         // ----------------------------------------------------
 
         removeCurrentModel();
@@ -347,7 +528,7 @@ fileInput.addEventListener(
 
 
         // ----------------------------------------------------
-        // REMOVE PREVIOUS TEMPORARY URL
+        // REMOVE OLD OBJECT URL
         // ----------------------------------------------------
 
         if (
@@ -365,7 +546,7 @@ fileInput.addEventListener(
 
 
         // ----------------------------------------------------
-        // CREATE TEMPORARY LOCAL URL
+        // CREATE URL FROM LOCAL GLB
         // ----------------------------------------------------
 
         currentObjectURL =
@@ -374,17 +555,6 @@ fileInput.addEventListener(
             );
 
 
-
-        console.log(
-            "Temporary model URL:",
-            currentObjectURL
-        );
-
-
-
-        // ----------------------------------------------------
-        // LOAD MODEL
-        // ----------------------------------------------------
 
         loadModel(
             currentObjectURL
@@ -416,7 +586,9 @@ function loadModel(
         // SUCCESS
         // ----------------------------------------------------
 
-        function (gltf) {
+        function (
+            gltf
+        ) {
 
 
             console.log(
@@ -493,7 +665,26 @@ function loadModel(
 
 
             // ------------------------------------------------
-            // AUTO-FIT CAMERA
+            // RESET PLAYER
+            // ------------------------------------------------
+
+            player.position.set(
+                0,
+                0,
+                0
+            );
+
+
+            player.rotation.set(
+                0,
+                0,
+                0
+            );
+
+
+
+            // ------------------------------------------------
+            // DESKTOP CAMERA
             // ------------------------------------------------
 
             fitCameraToModel(
@@ -505,30 +696,42 @@ function loadModel(
 
 
         // ----------------------------------------------------
-        // LOADING PROGRESS
+        // PROGRESS
         // ----------------------------------------------------
 
-        function (xhr) {
+        function (
+            xhr
+        ) {
 
 
             if (
-                xhr.total > 0
+                xhr.total >
+                0
             ) {
 
 
                 const percent =
+
                     (
                         xhr.loaded /
                         xhr.total
-                    ) * 100;
+                    )
+
+                    * 100;
 
 
                 console.log(
 
-                    percent.toFixed(1)
-                    + "% loaded"
+                    "Loading:",
+
+                    percent.toFixed(
+                        1
+                    )
+
+                    + "%"
 
                 );
+
 
             }
 
@@ -540,7 +743,9 @@ function loadModel(
         // ERROR
         // ----------------------------------------------------
 
-        function (error) {
+        function (
+            error
+        ) {
 
 
             console.error(
@@ -571,7 +776,7 @@ function loadModel(
 
 
 // ============================================================
-// FIT CAMERA TO MODEL
+// FIT DESKTOP CAMERA
 // ============================================================
 
 function fitCameraToModel(
@@ -593,20 +798,28 @@ function fitCameraToModel(
 
 
     // --------------------------------------------------------
-    // CAMERA CLIPPING
+    // CLIPPING
     // --------------------------------------------------------
 
     camera.near =
         Math.max(
-            maxDimension / 100000,
+
+            maxDimension /
+            100000,
+
             0.001
+
         );
 
 
     camera.far =
         Math.max(
-            maxDimension * 100,
+
+            maxDimension *
+            100,
+
             1000
+
         );
 
 
@@ -630,11 +843,12 @@ function fitCameraToModel(
 
         (
             2 *
+
             Math.tan(
-                fieldOfView / 2
+                fieldOfView /
+                2
             )
         );
-
 
 
     cameraDistance *=
@@ -646,12 +860,12 @@ function fitCameraToModel(
 
         cameraDistance,
 
-        cameraDistance * 0.6,
+        cameraDistance *
+        0.6,
 
         cameraDistance
 
     );
-
 
 
     controls.target.set(
@@ -666,12 +880,6 @@ function fitCameraToModel(
 
 
     controls.update();
-
-
-
-    console.log(
-        "Camera fitted to model."
-    );
 
 }
 
@@ -700,14 +908,16 @@ function removeCurrentModel() {
 
 
 
-    // --------------------------------------------------------
-    // CLEAN UP GPU MEMORY
-    // --------------------------------------------------------
-
     currentModel.traverse(
 
-        function (child) {
+        function (
+            child
+        ) {
 
+
+            // ------------------------------------------------
+            // GEOMETRY
+            // ------------------------------------------------
 
             if (
                 child.geometry
@@ -721,28 +931,39 @@ function removeCurrentModel() {
 
 
 
+            // ------------------------------------------------
+            // MATERIAL
+            // ------------------------------------------------
+
             if (
                 child.material
             ) {
 
 
                 const materials =
+
                     Array.isArray(
                         child.material
                     )
-                        ?
-                        child.material
-                        :
-                        [child.material];
+
+                        ? child.material
+
+                        : [
+                            child.material
+                        ];
 
 
 
                 materials.forEach(
 
-                    function (material) {
+                    function (
+                        material
+                    ) {
 
 
-                        // Dispose textures
+                        // ------------------------------------
+                        // TEXTURES
+                        // ------------------------------------
 
                         for (
                             const key
@@ -751,12 +972,17 @@ function removeCurrentModel() {
 
 
                             const value =
-                                material[key];
+                                material[
+                                    key
+                                ];
 
 
                             if (
+
                                 value &&
+
                                 value.isTexture
+
                             ) {
 
 
@@ -782,14 +1008,8 @@ function removeCurrentModel() {
     );
 
 
-
     currentModel =
         null;
-
-
-    console.log(
-        "Previous model removed."
-    );
 
 }
 
@@ -873,15 +1093,6 @@ vrButton.style.border =
 
 
 // ============================================================
-// CURRENT MODE
-// ============================================================
-
-let currentMode =
-    "desktop";
-
-
-
-// ============================================================
 // DESKTOP MODE
 // ============================================================
 
@@ -916,11 +1127,6 @@ desktopButton.addEventListener(
 
         controls.enabled =
             true;
-
-
-        console.log(
-            "Desktop mode."
-        );
 
     }
 
@@ -964,14 +1170,277 @@ questButton.addEventListener(
         controls.enabled =
             false;
 
-
-        console.log(
-            "Meta Quest mode."
-        );
-
     }
 
 );
+
+
+
+// ============================================================
+// VR MOVEMENT
+// ============================================================
+
+function updateVRMovement(delta) {
+
+    if (!renderer.xr.isPresenting) {
+        return;
+    }
+
+    const session = renderer.xr.getSession();
+
+    if (!session) {
+        return;
+    }
+
+    for (const inputSource of session.inputSources) {
+
+        const gamepad = inputSource.gamepad;
+
+        if (!gamepad) {
+            continue;
+        }
+
+        const axes = gamepad.axes;
+
+        let x = 0;
+        let y = 0;
+
+        // ----------------------------------------------------
+        // QUEST / WEBXR AXIS DETECTION
+        // ----------------------------------------------------
+
+        if (axes.length >= 4) {
+
+            // Most Quest Touch / WebXR layouts
+            x = axes[2];
+            y = axes[3];
+
+        }
+
+        else if (axes.length >= 2) {
+
+            // Some runtimes expose only the thumbstick pair
+            x = axes[0];
+            y = axes[1];
+
+        }
+
+        // ----------------------------------------------------
+        // DEADZONE
+        // ----------------------------------------------------
+
+        if (Math.abs(x) < deadzone) {
+            x = 0;
+        }
+
+        if (Math.abs(y) < deadzone) {
+            y = 0;
+        }
+
+        // ----------------------------------------------------
+        // DEBUG
+        // ----------------------------------------------------
+
+        if (x !== 0 || y !== 0) {
+
+            console.log(
+                inputSource.handedness,
+                "x:",
+                x.toFixed(2),
+                "y:",
+                y.toFixed(2),
+                "axes:",
+                axes
+            );
+
+        }
+
+        // ----------------------------------------------------
+        // LEFT STICK
+        // ----------------------------------------------------
+
+        if (inputSource.handedness === "left") {
+
+            moveHorizontal(
+                x,
+                y,
+                delta
+            );
+
+        }
+
+        // ----------------------------------------------------
+        // RIGHT STICK
+        // ----------------------------------------------------
+
+        if (inputSource.handedness === "right") {
+
+            moveVertical(
+                y,
+                delta
+            );
+
+        }
+
+    }
+
+}
+
+
+// ============================================================
+// HORIZONTAL VR MOVEMENT
+// ============================================================
+
+function moveHorizontal(
+
+    x,
+
+    y,
+
+    delta
+
+) {
+
+
+    // --------------------------------------------------------
+    // HEADSET FACING DIRECTION
+    // --------------------------------------------------------
+
+    const forward =
+        new THREE.Vector3();
+
+
+const xrCamera =
+    renderer.xr.getCamera(camera);
+
+xrCamera.getWorldDirection(
+    forward
+);
+
+
+    // Ignore headset pitch.
+    //
+    // Looking upward should not make the player fly upward.
+
+    forward.y =
+        0;
+
+
+    if (
+        forward.lengthSq() <
+        0.000001
+    ) {
+
+        return;
+
+    }
+
+
+    forward.normalize();
+
+
+
+    // --------------------------------------------------------
+    // RIGHT VECTOR
+    // --------------------------------------------------------
+
+    const right =
+        new THREE.Vector3();
+
+
+    right.crossVectors(
+
+        forward,
+
+        new THREE.Vector3(
+            0,
+            1,
+            0
+        )
+
+    );
+
+
+    right.normalize();
+
+
+    // --------------------------------------------------------
+    // FORWARD / BACKWARD
+    // --------------------------------------------------------
+
+    const forwardMove =
+
+        forward.clone()
+            .multiplyScalar(
+
+                -y *
+
+                moveSpeed *
+
+                delta
+
+            );
+
+
+
+    // --------------------------------------------------------
+    // STRAFE
+    // --------------------------------------------------------
+
+    const strafeMove =
+
+        right.clone()
+            .multiplyScalar(
+
+                x *
+
+                moveSpeed *
+
+                delta
+
+            );
+
+
+
+    // --------------------------------------------------------
+    // APPLY MOVEMENT
+    // --------------------------------------------------------
+
+    player.position.add(
+        forwardMove
+    );
+
+
+    player.position.add(
+        strafeMove
+    );
+
+}
+
+
+
+// ============================================================
+// VERTICAL VR MOVEMENT
+// ============================================================
+
+function moveVertical(
+
+    y,
+
+    delta
+
+) {
+
+
+    player.position.y +=
+
+        -y *
+
+        verticalSpeed *
+
+        delta;
+
+}
 
 
 
@@ -1028,7 +1497,7 @@ async function checkXR() {
 
 
             console.error(
-                "XR error:",
+                "XR support error:",
                 error
             );
 
@@ -1045,7 +1514,7 @@ checkXR();
 
 
 // ============================================================
-// WEBXR SESSION EVENTS
+// XR SESSION EVENTS
 // ============================================================
 
 renderer.xr.addEventListener(
@@ -1054,10 +1523,38 @@ renderer.xr.addEventListener(
 
     function () {
 
+        console.log("VR session started.");
 
-        console.log(
-            "VR session started."
+        // Reset player transform
+
+        player.position.set(
+            0,
+            0,
+            0
         );
+
+        player.rotation.set(
+            0,
+            0,
+            0
+        );
+
+        // WebXR will control the headset pose.
+        // Reset desktop camera offset.
+
+        camera.position.set(
+            0,
+            0,
+            0
+        );
+
+        camera.rotation.set(
+            0,
+            0,
+            0
+        );
+
+        clock.getDelta();
 
     }
 
@@ -1117,15 +1614,50 @@ window.addEventListener(
 
 
 // ============================================================
-// RENDER LOOP
+// ANIMATION LOOP
 // ============================================================
 
 function animate() {
 
 
+    const delta =
+        Math.min(
+
+            clock.getDelta(),
+
+            0.1
+
+        );
+
+
+
+    // --------------------------------------------------------
+    // VR
+    // --------------------------------------------------------
+
     if (
+        renderer.xr.isPresenting
+    ) {
+
+
+        updateVRMovement(
+            delta
+        );
+
+
+    }
+
+
+
+    // --------------------------------------------------------
+    // DESKTOP
+    // --------------------------------------------------------
+
+    else if (
+
         currentMode ===
         "desktop"
+
     ) {
 
 
@@ -1149,7 +1681,7 @@ function animate() {
 
 
 // ============================================================
-// START RENDER LOOP
+// START
 // ============================================================
 
 renderer.setAnimationLoop(
